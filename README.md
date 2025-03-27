@@ -6,9 +6,9 @@ A command-line text-to-speech tool using Kokoro ONNX.
 
 ### Prerequisites
 
-On Linux, you need to install portaudio development files:
+On Linux, you need to install portaudio and espeak-ng development files:
 ```bash
-sudo apt-get install portaudio19-dev
+sudo apt-get install portaudio19-dev espeak-ng
 ```
 
 ### Using uv (recommended)
@@ -27,6 +27,21 @@ source .venv/bin/activate  # On Unix/macOS
 # or
 .venv\Scripts\activate  # On Windows
 uv pip install -e .
+```
+
+### Binary Installation
+
+You can download the pre-built binary from the releases page. The binary requires espeak-ng to be installed on your system:
+
+```bash
+# On Ubuntu/Debian
+sudo apt-get install espeak-ng
+
+# On Fedora
+sudo dnf install espeak-ng
+
+# On Arch Linux
+sudo pacman -S espeak-ng
 ```
 
 ## Usage
@@ -114,4 +129,5 @@ kokorofile --server --port 8080
 - GPU version is sufficient only for Linux and Windows. macOS works with GPU by default.
 - You can see the used execution provider by enabling debug log with `--debug` option.
 - Model files are automatically downloaded on first run and cached in platform-specific directories.
+- The binary version requires espeak-ng to be installed on your system.
  
