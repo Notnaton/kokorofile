@@ -1,0 +1,22 @@
+[project]
+name = "kokorofile"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "kokoro-onnx[gpu]>=0.4.5",
+    "sounddevice>=0.5.1",
+    "soundfile>=0.13.1",
+    "platformdirs>=4.3.7",
+]
+
+[build-system]
+requires = ["hatchling>=1.19"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build]
+include = ["kokorofile.py"]
+
+[project.scripts]
+kokorofile = "kokorofile:main"
