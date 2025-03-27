@@ -31,7 +31,7 @@ uv pip install -e .
 
 ## Usage
 
-### Basic Usage
+### Command Line Usage
 
 ```bash
 # Convert text to speech and play through default audio device
@@ -47,15 +47,48 @@ kokorofile input.txt
 echo "Hello" | kokorofile
 ```
 
+### Server Mode
+
+Run as HTTP server:
+```bash
+kokorofile --server
+```
+
+The server provides a REST API with the following endpoints:
+
+- `POST /synthesize`: Generate speech from text
+  ```bash
+  curl -X POST "http://localhost:8000/synthesize" \
+       -H "Content-Type: application/json" \
+       -d '{"text": "Hello", "voice": "af_sarah", "speed": 1.0, "lang": "en-us"}'
+  ```
+
+- `GET /voices`: List available voices
+  ```bash
+  curl http://localhost:8000/voices
+  ```
+
+- `GET /devices`: List available audio devices
+  ```bash
+  curl http://localhost:8000/devices
+  ```
+
+Interactive API documentation is available at `http://localhost:8000/docs`
+
 ### Options
 
 - `-o, --output`: Output file path (if not provided, plays through audio device)
 - `-d, --device`: Audio device ID to use for playback
 - `-l, --list-devices`: List available audio devices
+- `--cache-dir`: Override default cache directory
+- `--data-dir`: Override default data directory
 - `--voice`: Voice to use (default: af_sarah)
 - `--speed`: Speech speed (default: 1.0)
 - `--lang`: Language code (default: en-us)
 - `--debug`: Enable debug logging
+- `--server`: Run as HTTP server
+- `--host`: Server host (default: 127.0.0.1)
+- `--port`: Server port (default: 8000)
 
 ### Examples
 
@@ -71,6 +104,9 @@ kokorofile "Hello" -d 1
 
 # List available audio devices
 kokorofile -l
+
+# Run server on custom port
+kokorofile --server --port 8080
 ```
 
 ## Notes

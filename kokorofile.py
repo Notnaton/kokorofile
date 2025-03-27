@@ -8,6 +8,11 @@ import tempfile
 import os
 from platformdirs import user_cache_dir, user_data_dir
 import logging
+from fastapi import FastAPI, HTTPException
+from fastapi.responses import FileResponse
+from pydantic import BaseModel
+import uvicorn
+from typing import Optional
 
 def setup_logging(debug=False):
     """Setup logging configuration."""
@@ -86,6 +91,61 @@ def text_to_speech(text, output_file=None, device=None, voice="af_sarah", speed=
         sd.play(audio, sample_rate)
         sd.wait()
 
+class TTSRequest(BaseModel):
+    text: str
+    voice: str = "af_sarah"
+    speed: float = 1.0
+    lang: str = "en-us"
+
+def run_server(host: str = "127.0.0.1", port: int = 8000):
+    """Run FastAPI server for text-to-speech requests."""
+    app = FastAPI(
+        title="Kokorofile TTS Server",
+        description="Text-to-speech server using Kokoro ONNX",
+        version="0.1.0"
+    )
+    
+    @app.post("/synthesize")
+    async def synthesize(request: TTSRequest):
+        """Synthesize speech from text and return audio file."""
+        try:
+            # Create temporary file for audio
+            with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as temp_file:
+                output_path = temp_file.name
+            
+            # Generate speech
+            text_to_speech(
+                request.text,
+                output_path,
+                voice=request.voice,
+                speed=request.speed,
+                lang=request.lang
+            )
+            
+            # Return the audio file
+            return FileResponse(
+                output_path,
+                media_type="audio/wav",
+                filename="output.wav"
+            )
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
+    
+    @app.get("/voices")
+    async def list_voices():
+        """List available voices."""
+        # This is a placeholder - you might want to implement actual voice listing
+        return {"voices": ["af_sarah"]}
+    
+    @app.get("/devices")
+    async def list_devices():
+        """List available audio devices."""
+        return {"devices": sd.query_devices()}
+    
+    print(f"Server running at http://{host}:{port}")
+    print(f"API documentation available at http://{host}:{port}/docs")
+    uvicorn.run(app, host=host, port=port)
+
 def main():
     parser = argparse.ArgumentParser(description='Convert text to speech using Kokoro')
     parser.add_argument('input', nargs='?', help='Input text or file path (if not provided, reads from stdin)')
@@ -98,11 +158,18 @@ def main():
     parser.add_argument('--speed', type=float, default=1.0, help='Speech speed (default: 1.0)')
     parser.add_argument('--lang', default='en-us', help='Language code (default: en-us)')
     parser.add_argument('--debug', action='store_true', help='Enable debug logging')
+    parser.add_argument('--server', action='store_true', help='Run as HTTP server')
+    parser.add_argument('--host', default='127.0.0.1', help='Server host (default: 127.0.0.1)')
+    parser.add_argument('--port', type=int, default=8000, help='Server port (default: 8000)')
     
     args = parser.parse_args()
     
     # Setup logging
     setup_logging(args.debug)
+    
+    if args.server:
+        run_server(args.host, args.port)
+        return
     
     if args.list_devices:
         print("\nAvailable audio devices:")
