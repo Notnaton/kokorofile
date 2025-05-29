@@ -1,13 +1,9 @@
-#!/bin/bash
+rm -rf build/ dist/ kokorofile.spec
 
-# Exit on error
-set -e
-
-echo "Building kokorofile..."
-
-# Run the Cosmopolitan build script
-./scripts/cosmo.sh
-
-echo "Build complete! Binary is available in dist/kokorofile"
-echo "Note: This is a portable binary that includes all dependencies."
-echo "      No additional installation is required." 
+uv run pyinstaller --onefile \
+  --name kokorofile \
+  --add-data "models:models" \
+  --add-data "models/voices:voices" \
+  --collect-all kokoro \
+  --upx-dir=upx \
+  server.py

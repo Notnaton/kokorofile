@@ -5,13 +5,13 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "kokoro-onnx[gpu]>=0.4.5",
-    "sounddevice>=0.5.1",
-    "soundfile>=0.13.1",
-    "platformdirs>=4.3.7",
     "fastapi>=0.115.12",
-    "pydantic>=2.11.0",
-    "uvicorn>=0.34.0",
+    "kokoro>=0.9.4",
+    "pip>=25.1.1",
+    "pydantic>=2.11.5",
+    "sounddevice>=0.5.2",
+    "soundfile>=0.13.1",
+    "uvicorn>=0.34.2",
 ]
 
 [build-system]
@@ -19,7 +19,7 @@ requires = ["hatchling>=1.19"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build]
-include = ["kokorofile.py"]
+include = ["server.py"]
 
 [project.scripts]
-kokorofile = "kokorofile:main"
+kokorofile = "server:main"
